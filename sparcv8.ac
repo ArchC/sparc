@@ -1,0 +1,30 @@
+/********************************************************/
+/* The ArchC SPARC-V8 functional model.                 */
+/* Author: Sandro Rigo and Marcus Bartholomeu           */
+/*         Alexandro Baldassin (acasm information)      */
+/*                                                      */
+/* For more information on ArchC, please visit:         */
+/* http://www.archc.org                                 */
+/*                                                      */
+/* The ArchC Team                                       */
+/* Computer Systems Laboratory (LSC)                    */
+/* IC-UNICAMP                                           */
+/* http://www.lsc.ic.unicamp.br                         */
+/********************************************************/
+
+AC_ARCH(sparcv8){
+
+  ac_cache   DM:5242880;
+  ac_regbank RB:256;
+  ac_regbank REGS:32;
+  ac_reg PSR;
+  ac_reg Y;
+
+  ac_wordsize 32;
+
+  ARCH_CTOR(sparcv8){
+
+    ac_isa("sparcv8_isa.ac");
+    set_endian("big");
+  };
+};

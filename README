@@ -1,0 +1,71 @@
+This is the SPARC-V8 ArchC functional model.
+
+This model has the system call emulation functions implemented,
+so it is a good idea to turn on the ABI option.
+
+To use acsim, the interpreted simulator:
+
+    acsim sparcv8.ac -abi               (create the simulator)
+    make -f Makefile.archc              (compile)
+    sparcv8.x --load=<file-path> [args] (run an application)
+
+To use accsim, the compiled simulator:
+
+    accsim sparcv8.ac -abi <file-path>  (create specialized simulator)
+    make -f Makefile.archc              (compile)
+    sparcv8.x [args]                    (run the application)
+
+The [args] are optional arguments for the application.
+
+There are two formats recognized for application <file-path>:
+- ELF binary matching ArchC specifications
+- hexadecimal text file for ArchC
+
+
+To use acasm, the assembler generator:
+
+    asmgen.sh sparcv8.ac <assembler_name> (generate the assembler 
+                                           source files) 
+    proceed to build it using the GNU autotools (configure, make all-gas, 
+                                                 make install-gas)
+
+
+For more information visit http://www.archc.org
+
+
+CHANGELOG:
+==========
+Version 0.7.5:
+
+- Fixed 'unimplemented' instruction format and assembly syntax
+- Fix bug in mulscc_reg and mulscc_imm instructions (condition codes)
+- npc initialization depends on ac_pc, so program can start at arbitrary address
+
+
+Version 0.7.4:
+
+- Included assembly language syntax information
+
+
+Version 0.7.3:
+
+- Fix bug in instruction MULSCC (used only for V7 multiplication)
+- New REGS register bank holds the current register window from RB
+- Use ArchC support for debug messages: ac_debug_model.H
+- Use operator[] syntax to read register banks, which is faster
+
+
+Version 0.7.2:
+
+- Included optimization instruction methods for compiled simulation
+- Separate nop instruction from sethi to optimize simulation
+
+
+Version 0.7.1:
+
+- Included file for GDB integration
+
+
+Version 0.7.0:
+
+- Model passed selected Mediabench and Mibench applications
