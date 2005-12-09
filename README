@@ -38,7 +38,7 @@ CHANGELOG:
 Version 0.7.5:
 
 - Fixed 'unimplemented' instruction format and assembly syntax
-- Fix bug in mulscc_reg and mulscc_imm instructions (condition codes)
+- Fixed bug in mulscc_reg and mulscc_imm instructions (condition codes)
 - npc initialization depends on ac_pc, so program can start at arbitrary address
 
 
