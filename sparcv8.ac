@@ -14,7 +14,7 @@
 
 AC_ARCH(sparcv8){
 
-  ac_cache   DM:5242880;
+  ac_mem   DM:5M;
   ac_regbank RB:256;
   ac_regbank REGS:32;
   ac_reg PSR;
