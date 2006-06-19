@@ -1,15 +1,24 @@
-/********************************************************/
-/* The ArchC SPARC-V8 functional model.                 */
-/* Author: Sandro Rigo and Marcus Bartholomeu           */
-/*                                                      */
-/* For more information on ArchC, please visit:         */
-/* http://www.archc.org                                 */
-/*                                                      */
-/* The ArchC Team                                       */
-/* Computer Systems Laboratory (LSC)                    */
-/* IC-UNICAMP                                           */
-/* http://www.lsc.ic.unicamp.br                         */
-/********************************************************/
+/**
+ * @file      ansi-colors.h
+ * @author    Sandro Rigo
+ *            Marcus Bartholomeu
+ *
+ *            The ArchC Team
+ *            http://www.archc.org/
+ *
+ *            Computer Systems Laboratory (LSC)
+ *            IC-UNICAMP
+ *            http://www.lsc.ic.unicamp.br
+ *
+ * @version   version?
+ * @date      Mon, 19 Jun 2006 15:33:29 -0300
+ * 
+ * @brief     The ArchC SPARC-V8 functional model.
+ * 
+ * @attention Copyright (C) 2002-2006 --- The ArchC Team
+ *
+ */
+
 #ifndef ANSI_COLORS_H
 #define ANSI_COLORS_H
 
