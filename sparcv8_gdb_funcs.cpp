@@ -11,7 +11,7 @@
  *            http://www.lsc.ic.unicamp.br
  *
  * @version   version?
- * @date      Mon, 19 Jun 2006 15:33:29 -0300
+ * @date      Mon, 19 Jun 2006 15:50:50 -0300
  * 
  * @brief     The ArchC SPARC-V8 functional model.
  * 
@@ -21,15 +21,11 @@
 
 #include "sparcv8.H"
 
-extern unsigned char CWP;     
-extern unsigned char WIM;     
-extern int npc;               
-
+using namespace sparcv8_parms;
 
 int sparcv8::nRegs(void) {
   return 72;
 }
-
 
 ac_word sparcv8::reg_read( int reg ) {
   /* General Purpose: G, O, L, I */
@@ -59,7 +55,7 @@ void sparcv8::reg_write( int reg, ac_word value ) {
   else if ( reg == 64 ) Y   = value;
   else if ( reg == 65 ) PSR = value;
   else if ( reg == 66 ) WIM = value;
-  else if ( reg == 68 ) ac_resources::ac_pc = value;
+  else if ( reg == 68 ) ac_pc = value;
   else if ( reg == 69 ) npc = value;
 }
 

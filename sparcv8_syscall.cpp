@@ -11,7 +11,7 @@
  *            http://www.lsc.ic.unicamp.br
  *
  * @version   version?
- * @date      Mon, 19 Jun 2006 15:33:29 -0300
+ * @date      Mon, 19 Jun 2006 15:50:50 -0300
  * 
  * @brief     The ArchC SPARC-V8 functional model.
  * 
@@ -20,10 +20,12 @@
  */
 
 #include "sparcv8_syscall.H"
-#include "ac_resources.H"
 
 #define writeReg(addr, val) REGS[addr] = (addr)? ac_word(val) : 0
 #define readReg(addr) REGS[addr]
+
+// Namespace for sparcv8 types.
+using namespace sparcv8_parms;
 
 void sparcv8_syscall::get_buffer(int argn, unsigned char* buf, unsigned int size)
 {
@@ -65,7 +67,6 @@ void sparcv8_syscall::set_int(int argn, int val)
 void sparcv8_syscall::return_from_syscall()
 {
   //similar to retl (jmpl %o7+8, %g0), but annul next
-  extern int npc;
   npc = readReg(15) + 8;
   ac_pc = npc;
   npc += 4;
@@ -73,7 +74,6 @@ void sparcv8_syscall::return_from_syscall()
 
 void sparcv8_syscall::set_prog_args(int argc, char **argv)
 {
-  extern const unsigned AC_RAM_END;
   int i, j, base;
 
   unsigned int ac_argv[30];
