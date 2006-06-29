@@ -1,5 +1,5 @@
 /**
- * @file      file?
+ * @file      sparcv8.ac
  * @author    Sandro Rigo
  *            Marcus Bartholomeu
  *            Alexandro Baldassin (assembly information)
@@ -11,8 +11,8 @@
  *            IC-UNICAMP
  *            http://www.lsc.ic.unicamp.br
  *
- * @version   version?
- * @date      date?
+ * @version   1.0
+ * @date      Thu, 29 Jun 2006 14:49:07 -0300
  * 
  * @brief     The ArchC SPARC-V8 functional model.
  * 
