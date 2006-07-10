@@ -54,7 +54,7 @@ void ac_behavior( Type_FT ){}
 //!User declared functions.
 
 #define writeReg(addr, val) REGS[addr] = (addr)? ac_word(val) : 0
-#define readReg(addr) REGS[addr]
+#define readReg(addr) (int)(REGS[addr])
 
 
 inline void update_pc(bool branch, bool taken, bool b_always, bool annul, ac_word addr, ac_reg<unsigned>& ac_pc, ac_reg<ac_word>& npc)
