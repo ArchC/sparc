@@ -34,6 +34,11 @@ For more information visit http://www.archc.org
 CHANGELOG:
 ==========
 
+Version 0.7.7-archc2.0beta3:
+
+- Fixed an annoying bug which caused a segfault on the fft program (MiBench)
+
+
 Version 0.7.6-archc2.0beta3:
 
 - Added license headers
