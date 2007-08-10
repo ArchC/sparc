@@ -1,0 +1,32 @@
+
+ac_modifier_encode(low)
+{
+  reloc->Type_F3B.simm13 = reloc->input & 0x3FF;
+
+//  reloc->output = reloc->input & 0x3FF;
+}
+
+ac_modifier_decode(low)
+{
+}
+
+ac_modifier_encode(pcrel)
+{
+  reloc->output = (reloc->input - reloc->address) >> 2;
+}
+
+ac_modifier_decode(pcrel)
+{
+  reloc->output = (reloc->input << 2) + reloc->address;
+}
+
+ac_modifier_encode(high)
+{
+  reloc->Type_F2A.imm22 = reloc->input >> 10;
+
+//  reloc->output = reloc->input >> 10;
+}
+
+ac_modifier_decode(high)
+{
+}
