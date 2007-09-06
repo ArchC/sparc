@@ -34,9 +34,10 @@ For more information visit http://www.archc.org
 CHANGELOG:
 ==========
 
-Version 0.7.8-archc2.0:
+Version 0.7.8:
 
 - Added binary utilities support files
+- ArchC 2.0 compliant
 
 
 Version 0.7.7-archc2.0beta3:
