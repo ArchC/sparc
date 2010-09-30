@@ -116,11 +116,6 @@ void sparcv8_syscall::set_prog_args(int argc, char **argv)
   writeReg(9, AC_RAM_END-512-120);
 }
 
-// Method for compatibility with new models
-int *sparcv8_syscall::get_syscall_table(){
-	static int syscall_table[] = { 0, 0, 0, 0};
-	return syscall_table;
-}
 
 
 
