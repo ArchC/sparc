@@ -16,6 +16,20 @@
  * @brief     The ArchC SPARC-V8 functional model.
  * 
  * @attention Copyright (C) 2002-2006 --- The ArchC Team
+ * 
+ * This program is free software; you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation; either version 2 of the License, or 
+ * (at your option) any later version. 
+ * 
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * GNU General Public License for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License 
+ * along with this program; if not, write to the Free Software 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
 
@@ -101,3 +115,12 @@ void sparcv8_syscall::set_prog_args(int argc, char **argv)
   //Set %o1 to the string pointers
   writeReg(9, AC_RAM_END-512-120);
 }
+
+// Method for compatibility with new models
+int *sparcv8_syscall::get_syscall_table(){
+	static int syscall_table[] = { 0, 0, 0, 0};
+	return syscall_table;
+}
+
+
+
