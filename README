@@ -1,4 +1,4 @@
-This is the SPARC-V8 ArchC 2.1 functional model.
+This is the SPARC-V8 ArchC 2.0-beta functional model.
 
 This model has the system call emulation functions implemented,
 so it is a good idea to turn on the ABI option.
@@ -33,9 +33,6 @@ For more information visit http://www.archc.org
 
 CHANGELOG:
 ==========
-
-Version 0.7.9:
-- ArchC 2.1 compliant
 
 Version 0.7.8:
 
