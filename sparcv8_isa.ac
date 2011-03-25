@@ -424,6 +424,7 @@ AC_ISA(sparcv8){
     umulcc_reg.set_decoder(op=0x02, op3=0x1A, is=0x00);
 
     umul_reg.set_asm("umul %reg, %reg, %reg", rs1, rs2, rd);
+    umul_reg.set_asm("umul %reg, %reg, \%g0", rs1, rs2, rd="%g0");
     umul_reg.set_decoder(op=0x02, op3=0x0A, is=0x00);
 
     smul_imm.set_asm("smul %reg, %imm, %reg", rs1, simm13, rd);
@@ -434,6 +435,7 @@ AC_ISA(sparcv8){
     smulcc_imm.set_decoder(op=0x02, op3=0x1B, is=0x01);
 
     smul_reg.set_asm("smul %reg, %reg, %reg", rs1, rs2, rd);
+    smul_reg.set_asm("smul %reg, %reg, \%g0", rs1, rs2, rd="%g0");
     smul_reg.set_decoder(op=0x02, op3=0x0B, is=0x00);
 
     smulcc_reg.set_asm("smulcc %reg, %reg, %reg", rs1, rs2, rd);
@@ -546,6 +548,7 @@ AC_ISA(sparcv8){
     bvs.set_decoder(op=0x00, cond=0x07, op2=0x02);
 
     call.set_asm("call %exp(pcrel)", disp30);
+    call.set_asm("call %exp(pcrel)", disp30); // compiler_info related information
     call.set_decoder(op=0x01);
 
     rdy.set_asm("rd \%y, %reg", rs1=0, rd);
