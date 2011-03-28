@@ -292,6 +292,7 @@ define instruction jmpl_imm semantic as () cost 1;
 define instruction jmpl_imm semantic as () cost 1;
 define instruction jmpl_imm semantic as () cost 1;
 define instruction jmpl_imm semantic as () cost 1;
+define instruction jmpl_imm semantic as () cost 1;
 define instruction jmpl_imm semantic as (
   (ret);
 ) cost 1, has_delay_slot;
