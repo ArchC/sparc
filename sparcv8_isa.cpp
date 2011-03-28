@@ -30,7 +30,7 @@
 #include  "sparcv8_bhv_macros.H"
 
 //If you want debug information for this model, uncomment next line
-//#define DEBUG_MODEL
+#define DEBUG_MODEL
 #include "ac_debug_model.H"
 #include "ansi-colors.h" 
 
@@ -40,7 +40,7 @@ using namespace sparcv8_parms;
 //!Generic instruction behavior method.
 void ac_behavior( instruction )
 {
-  dbg_printf("----- PC=0x%x  NPC=0x%x ----- #executed=%lld\n", (int) ac_pc, npc, ac_instr_counter);
+  dbg_printf("----- PC=0x%x  NPC=0x%x ----- #executed=%lld\n", (unsigned) ac_pc.read(), (unsigned)npc.read(), ac_instr_counter);
 }
  
 //! Instruction Format behavior methods.
