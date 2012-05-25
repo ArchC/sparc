@@ -1,5 +1,5 @@
 /**
- * @file      sparcv8_gdb_funcs.cpp
+ * @file      sparc_gdb_funcs.cpp
  * @author    Sandro Rigo
  *            Marcus Bartholomeu
  *
@@ -19,15 +19,15 @@
  *
  */
 
-#include "sparcv8.H"
+#include "sparc.H"
 
-using namespace sparcv8_parms;
+using namespace sparc_parms;
 
-int sparcv8::nRegs(void) {
+int sparc::nRegs(void) {
   return 72;
 }
 
-ac_word sparcv8::reg_read( int reg ) {
+ac_word sparc::reg_read( int reg ) {
   /* General Purpose: G, O, L, I */
   if ( ( reg >= 0 ) && ( reg < 32 ) ) {
     return REGS[reg];
@@ -45,7 +45,7 @@ ac_word sparcv8::reg_read( int reg ) {
 }
 
 
-void sparcv8::reg_write( int reg, ac_word value ) {
+void sparc::reg_write( int reg, ac_word value ) {
   /* General Purpose: G, O, L & I regs */
   if ( ( reg >= 0 ) && ( reg < 32 ) ) {
     REGS[reg] = value;
@@ -60,11 +60,11 @@ void sparcv8::reg_write( int reg, ac_word value ) {
 }
 
 
-unsigned char sparcv8::mem_read( unsigned int address ) {
+unsigned char sparc::mem_read( unsigned int address ) {
   return IM->read_byte( address );
 }
 
 
-void sparcv8::mem_write( unsigned int address, unsigned char byte ) {
+void sparc::mem_write( unsigned int address, unsigned char byte ) {
   IM->write_byte( address, byte );
 }

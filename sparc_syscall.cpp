@@ -1,5 +1,5 @@
 /**
- * @file      sparcv8_syscall.cpp
+ * @file      sparc_syscall.cpp
  * @author    Sandro Rigo
  *            Marcus Bartholomeu
  *
@@ -33,15 +33,15 @@
  *
  */
 
-#include "sparcv8_syscall.H"
+#include "sparc_syscall.H"
 
 #define writeReg(addr, val) REGS[addr] = (addr)? ac_word(val) : 0
 #define readReg(addr) REGS[addr]
 
-// Namespace for sparcv8 types.
-using namespace sparcv8_parms;
+// Namespace for sparc types.
+using namespace sparc_parms;
 
-void sparcv8_syscall::get_buffer(int argn, unsigned char* buf, unsigned int size)
+void sparc_syscall::get_buffer(int argn, unsigned char* buf, unsigned int size)
 {
   unsigned int addr = readReg(8+argn);
 
@@ -50,7 +50,7 @@ void sparcv8_syscall::get_buffer(int argn, unsigned char* buf, unsigned int size
   }
 }
 
-void sparcv8_syscall::set_buffer(int argn, unsigned char* buf, unsigned int size)
+void sparc_syscall::set_buffer(int argn, unsigned char* buf, unsigned int size)
 {
   unsigned int addr = readReg(8+argn);
 
@@ -59,7 +59,7 @@ void sparcv8_syscall::set_buffer(int argn, unsigned char* buf, unsigned int size
   }
 }
 
-void sparcv8_syscall::set_buffer_noinvert(int argn, unsigned char* buf, unsigned int size)
+void sparc_syscall::set_buffer_noinvert(int argn, unsigned char* buf, unsigned int size)
 {
   unsigned int addr = readReg(8+argn);
 
@@ -68,17 +68,17 @@ void sparcv8_syscall::set_buffer_noinvert(int argn, unsigned char* buf, unsigned
   }
 }
 
-int sparcv8_syscall::get_int(int argn)
+int sparc_syscall::get_int(int argn)
 {
   return readReg(8+argn);
 }
 
-void sparcv8_syscall::set_int(int argn, int val)
+void sparc_syscall::set_int(int argn, int val)
 {
   writeReg(8+argn, val);
 }
 
-void sparcv8_syscall::return_from_syscall()
+void sparc_syscall::return_from_syscall()
 {
   //similar to retl (jmpl %o7+8, %g0), but annul next
   npc = readReg(15) + 8;
@@ -86,7 +86,7 @@ void sparcv8_syscall::return_from_syscall()
   npc += 4;
 }
 
-void sparcv8_syscall::set_prog_args(int argc, char **argv)
+void sparc_syscall::set_prog_args(int argc, char **argv)
 {
   int i, j, base;
 
@@ -101,15 +101,15 @@ void sparcv8_syscall::set_prog_args(int argc, char **argv)
     j += len;
   }
 
-  //Ajust %sp and write argument string
-  writeReg(14, AC_RAM_END-512);
-  set_buffer(6, (unsigned char*) ac_argstr, 512);
 
-  //Ajust %sp and write string pointers
-  writeReg(14, AC_RAM_END-512-120);
-  set_buffer_noinvert(6, (unsigned char*) ac_argv, 120);
+  writeReg(8, AC_RAM_END-512);
+  set_buffer(0, (unsigned char*) ac_argstr, 512);
 
-  //Set %o0 to the argument count
+
+  writeReg(8, AC_RAM_END-512-120);
+  set_buffer_noinvert(0, (unsigned char*) ac_argv, 120);
+
+ 
   writeReg(8, argc);
 
   //Set %o1 to the string pointers

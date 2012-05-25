@@ -1,5 +1,5 @@
 /**
- * @file      sparcv8_isa.cpp
+ * @file      sparc_isa.cpp
  * @author    Sandro Rigo
  *            Marcus Bartholomeu
  *
@@ -25,17 +25,20 @@
 // 2. Register windows: 4 bits for window (16 windows) + 4 bits for register = 8 bit
 //    using char type
 
-#include  "sparcv8_isa.H"
-#include  "sparcv8_isa_init.cpp"
-#include  "sparcv8_bhv_macros.H"
+#include  "sparc_isa.H"
+#include  "sparc_isa_init.cpp"
+#include  "sparc_bhv_macros.H"
 
 //If you want debug information for this model, uncomment next line
 #define DEBUG_MODEL
 #include "ac_debug_model.H"
 #include "ansi-colors.h" 
 
-// Namespace for sparcv8 types.
-using namespace sparcv8_parms;
+// Namespace for sparc types.
+using namespace sparc_parms;
+
+static int processors_started = 0;
+#define DEFAULT_STACK_SIZE (256*1024)
 
 //!Generic instruction behavior method.
 void ac_behavior( instruction )
@@ -131,6 +134,9 @@ void ac_behavior(begin)
   npc = ac_pc + 4;
 
   CWP = 0xF0;
+ /* sp for multi-core platforms */ 
+  writeReg(14,AC_RAM_END - 1024 - processors_started++ * DEFAULT_STACK_SIZE);
+
 }
 
 //!Function called after simulation end
@@ -1584,7 +1590,7 @@ void ac_behavior( trap_imm )
 void ac_behavior( unimplemented )
 {
   dbg_printf("unimplemented\n");
-  printf("sparcv8-isa.cpp: program flow reach instruction 'unimplemented' at ac_pc=%#x\n", (int)ac_pc);
+  printf("sparc-isa.cpp: program flow reach instruction 'unimplemented' at ac_pc=%#x\n", (int)ac_pc);
   stop(EXIT_FAILURE);
   update_pc(0,0,0,0,0, ac_pc, npc);
 }

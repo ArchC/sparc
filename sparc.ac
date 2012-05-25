@@ -1,5 +1,5 @@
 /**
- * @file      sparcv8.ac
+ * @file      sparc.ac
  * @author    Sandro Rigo
  *            Marcus Bartholomeu
  *            Alexandro Baldassin (assembly information)
@@ -20,9 +20,9 @@
  *
  */
 
-AC_ARCH(sparcv8){
+AC_ARCH(sparc){
 
-  ac_mem     DM:5M;
+  ac_mem     DM:16M;
   ac_regbank RB:256;
   ac_regbank REGS:32;
 
@@ -41,9 +41,9 @@ AC_ARCH(sparcv8){
 
   ac_wordsize 32;
 
-  ARCH_CTOR(sparcv8){
+  ARCH_CTOR(sparc){
 
-    ac_isa("sparcv8_isa.ac");
+    ac_isa("sparc_isa.ac");
     set_endian("big");
   };
 };

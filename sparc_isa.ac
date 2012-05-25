@@ -1,5 +1,5 @@
 /**
- * @file      sparcv8_isa.ac
+ * @file      sparc_isa.ac
  * @author    Sandro Rigo
  *            Marcus Bartholomeu
  *            Alexandro Baldassin (assembly information)
@@ -20,7 +20,7 @@
  *
  */
 
-AC_ISA(sparcv8){
+AC_ISA(sparc){
 
   ac_format Type_F1     = "%op:2 %disp30:30";
   ac_format Type_F2A 	= "%op:2 %rd:5 %op2:3 %imm22:22";
@@ -95,7 +95,7 @@ AC_ISA(sparcv8){
   }
 
 
-  ISA_CTOR(sparcv8){
+  ISA_CTOR(sparc){
 
     ldsb_reg.set_asm("ldsb [%reg + %reg], %reg", rs1, rs2, rd);
     ldsb_reg.set_asm("ldsb [%reg], %reg", rs1, rd, rs2="%g0");

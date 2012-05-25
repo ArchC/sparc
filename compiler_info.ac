@@ -1,5 +1,5 @@
-// SPARCV8 C Compiler Backend Information File
-// Part of SPARCV8 ArchC Model
+// sparc C Compiler Backend Information File
+// Part of sparc ArchC Model
 
 //====================-- Machine specific rules --============================//
 
