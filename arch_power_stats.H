@@ -9,7 +9,8 @@
 #define START_PROFILE 0
 #define NUM_INSTR 119
 //#define POWER_TABLE_FILE "../../processors/sparc/acpower_table.csv"
-#define POWER_TABLE_FILE "../../processors/sparc/acpower_table_sparc_xc3s1000_40Mhz.csv"
+//#define POWER_TABLE_FILE "../../processors/sparc/acpower_table_sparc_xc3s1000_40Mhz.csv"
+#define POWER_TABLE_FILE "powersc/acpower_table_sparc_xc3s1000_40Mhz.csv"
 //#define POWER_TABLE_FILE "../../processors/sparc/acpower_table_sparc_xc6slx75_40Mhz.csv"
 
 

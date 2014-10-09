@@ -22,7 +22,7 @@
 
 AC_ARCH(sparc){
 
-  ac_mem     DM:16M;
+  ac_mem     DM:512M;
   ac_regbank RB:256;
   ac_regbank REGS:32;
 
