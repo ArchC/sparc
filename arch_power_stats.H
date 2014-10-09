@@ -8,20 +8,18 @@
 // This group should be parameters, not defines
 #define START_PROFILE 0
 #define NUM_INSTR 119
-//#define POWER_TABLE_FILE "../../processors/sparc/acpower_table.csv"
-//#define POWER_TABLE_FILE "../../processors/sparc/acpower_table_sparc_xc3s1000_40Mhz.csv"
-#define POWER_TABLE_FILE "powersc/acpower_table_sparc_xc3s1000_40Mhz.csv"
-//#define POWER_TABLE_FILE "../../processors/sparc/acpower_table_sparc_xc6slx75_40Mhz.csv"
+
+// Tables in 'powersc' dir
+
+//#define POWER_TABLE_FILE "acpower_table.csv"
+//#define POWER_TABLE_FILE "acpower_table_sparc_xc3s1000_40Mhz.csv"
+#define POWER_TABLE_FILE "acpower_table_sparc_xc3s1000_40Mhz.csv"
+//#define POWER_TABLE_FILE "acpower_table_sparc_xc6slx75_40Mhz.csv"
 
 
 
 #define WINDOW_REPORT
-
-//#define WINDOW_REPORT_FILE "window_power_report.csv"
 #define WINDOW_REPORT_FILE "window_power_report"
-
-
-
 #define START_WINDOW_SIZE 1000000
 
 #define MAX_LINESIZE_CSV_FILE 10240 // Inefficient and non-scalable
@@ -248,18 +246,15 @@ class power_stats {
 
 			char* pch = NULL;
 
-             // Get self PATH
+            // Get self PATH
             char buff[1024];
-            ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
-            if (len != -1) 
-                  buff[len] = '\0';
-            string strbuff(buff);
-            strbuff = strbuff.substr(0, strbuff.find_last_of("\\/"));
-            strbuff = strbuff + "/" + filename;
+            strcat (buff, POWER_SIM);
+            strcat (buff, "/");
+            strcat (buff, filename);
 
-			f = fopen(strbuff.c_str(), "r");
+			f = fopen(buff, "r");
 			if (f == NULL) {
-				sprintf(aux, "Power file %s not found", strbuff.c_str());
+				sprintf(aux, "Power file %s not found", buff);
 				perror(aux);
 				exit(1);
 			}
