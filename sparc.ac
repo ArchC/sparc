@@ -39,6 +39,7 @@ AC_ARCH(sparc){
   ac_reg<8> WIM;
   ac_reg<8> CWP;
 
+  ac_reg id;
   ac_wordsize 32;
 
   ARCH_CTOR(sparc){
