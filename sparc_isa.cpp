@@ -65,10 +65,10 @@ inline void update_pc(bool branch, bool taken, bool b_always, bool annul, ac_wor
   //Reference book: "Sparc Architecture, Assembly Language Programing, and C"
   //  Author: Richard P. Paul. Prentice Hall, Second Edition. Page 87
 
-  // If (not to execute next instruction)
-#ifdef AC_MEM_HIERARCHY
-  if(!ac_wait_sig){
-#endif
+
+
+
+
 		if (branch && (!taken ||b_always) && annul) {
 			if (taken) {
 				npc = addr;
@@ -92,9 +92,9 @@ inline void update_pc(bool branch, bool taken, bool b_always, bool annul, ac_wor
 				npc+=4;
 			}
 		}
-#ifdef AC_MEM_HIERARCHY
-	}
-#endif
+
+	
+
 }
 
 
