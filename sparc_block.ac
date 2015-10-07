@@ -1,0 +1,63 @@
+/**
+ * @file      sparc.ac
+ * @author    Sandro Rigo
+ *            Marcus Bartholomeu
+ *            Alexandro Baldassin (assembly information)
+ *
+ *            The ArchC Team
+ *            http://www.archc.org/
+ *
+ *            Computer Systems Laboratory (LSC)
+ *            IC-UNICAMP
+ *            http://www.lsc.ic.unicamp.br
+ *
+ * @version   1.0
+ * @date      Thu, 29 Jun 2006 14:49:07 -0300
+ * 
+ * @brief     The ArchC SPARC-V8 functional model.
+ * 
+ * @attention Copyright (C) 2002-2006 --- The ArchC Team
+ *
+ */
+
+AC_ARCH(sparc){
+
+ 
+  ac_tlm2_port  MEM:512M;
+ 
+  ac_icache   IC("2w", 128, 32, "wb", "fifo");
+  ac_dcache   DC("2w", 512, 32, "wt", "fifo");
+  
+
+
+  ac_tlm2_intr_port intr_port;
+  
+
+  ac_regbank RB:256;
+  ac_regbank REGS:32;
+
+  ac_reg npc;
+
+  ac_reg<1> PSR_icc_n;
+  ac_reg<1> PSR_icc_z;
+  ac_reg<1> PSR_icc_v;
+  ac_reg<1> PSR_icc_c;
+
+  ac_reg PSR;
+  ac_reg Y;
+
+  ac_reg<8> WIM;
+  ac_reg<8> CWP;
+
+  ac_wordsize 32;
+  ac_fetchsize 32;
+  
+  ac_reg id;
+  ARCH_CTOR(sparc){
+
+    ac_isa("sparc_isa.ac");
+    set_endian("big");
+    IC.bindTo(MEM);
+    DC.bindTo(MEM);
+  };
+};
