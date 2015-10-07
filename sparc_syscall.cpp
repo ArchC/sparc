@@ -46,7 +46,7 @@ void sparc_syscall::get_buffer(int argn, unsigned char* buf, unsigned int size)
   unsigned int addr = readReg(8+argn);
 
   for (unsigned int i = 0; i<size; i++, addr++) {
-    buf[i] = DM.read_byte(addr);
+    buf[i] = DATA_PORT->read_byte(addr);
   }
 }
 
@@ -55,7 +55,7 @@ void sparc_syscall::set_buffer(int argn, unsigned char* buf, unsigned int size)
   unsigned int addr = readReg(8+argn);
 
   for (unsigned int i = 0; i<size; i++, addr++) {
-    DM.write_byte(addr, buf[i]);
+    DATA_PORT->write_byte(addr, buf[i]);
   }
 }
 
@@ -64,7 +64,7 @@ void sparc_syscall::set_buffer_noinvert(int argn, unsigned char* buf, unsigned i
   unsigned int addr = readReg(8+argn);
 
   for (unsigned int i = 0; i<size; i+=4, addr+=4) {
-    DM.write(addr, *(unsigned int *) &buf[i]);
+    DATA_PORT->write(addr, *(unsigned int *) &buf[i]);
   }
 }
 
