@@ -1,7 +1,7 @@
 # Number of profiles
 1
 # ProfileID, Characterization Frequency,Frequency Scale,EPI Scale,Characterization Name,Characterization Description
-0,40,1.00E+06,1.00E-12,"Leon3 at 40MHz","Using Xilinx tools, Spartan3 at 40MHz"
+40,1.00E+06,1.00E-12,"Leon3 at 40MHz","Using Xilinx tools, Spartan3 at 40MHz"
 # Stall consumption
 0
 1,add_imm,540.25
