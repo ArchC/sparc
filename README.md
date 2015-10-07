@@ -17,7 +17,7 @@ so it is a good idea to turn on the ABI option.
 To use acsim, the interpreted simulator:
 
     acsim sparcv8.ac -abi               (create the simulator)
-    make -f Makefile.archc              (compile)
+    make                                (compile)
     sparcv8.x --load=<file-path> [args] (run an application)
 
 The [args] are optional arguments for the application.
