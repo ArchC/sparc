@@ -1,8 +1,10 @@
-
+Makefile
 Makefile.archc
 main.cpp
 main.cpp.tmpl
 *.o
+*.a
+*.x
 sparc.H
 sparc.cpp
 sparc.x
@@ -16,6 +18,6 @@ sparc_isa.cpp.tmpl
 sparc_isa_init.cpp
 sparc_parms.H
 sparc_syscall.H.tmpl
-
-
+sparc_ih_bhv_macros.H
+sparc_intr_handlers.H
 
