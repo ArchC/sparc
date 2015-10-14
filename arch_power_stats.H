@@ -314,7 +314,7 @@ class power_stats {
 
              // Get self PATH
             char buff[1024];
-            strcat (buff, POWER_SIM);
+            strcpy (buff, POWER_SIM);
             strcat (buff, "/");
             strcat (buff, filename);
 
