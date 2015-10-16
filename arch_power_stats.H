@@ -1,9 +1,14 @@
 #ifdef POWER_SIM
 #include <powersc.h>
+#include <systemc>
+
+/* Data struct definition. You should think that it is a row in a table. Each profile will have a certain number of tables. 
+	 The basic idea is use a profile, with a pre-fixed number of operational frequencies. Each frequency, with a specific 
+	 table of values */
+
+// This group should be parameters, not defines
 
 #define NUM_INSTR 119
-
-
 //#define POWER_TABLE_FILE "acpower_table_sparc_spartan_50Mhz.csv"
 //#define POWER_TABLE_FILE "acpower_table_sparc_xc3s1000_40Mhz.csv"
 //#define POWER_TABLE_FILE "acpower_table_sparc_xc3s1200e_40Mhz.csv"
@@ -24,6 +29,10 @@
 #define TYPE_LINE_STALL       2
 #define TYPE_LINE_OP          3
 
+
+#define CYCLES_PER_FREQUENCY_EXCHANGE 20000 // nanoseconds = or 20 micro seconds
+#define CYCLES_TO_RESTART 300
+
 //#define DEBUG
 
 class power_stats {
@@ -38,12 +47,14 @@ class power_stats {
 			double power_scale;
 			double power[NUM_INSTR+1];
       		double stall_power;
+    		
 		};
 
 		struct power_stats_data
 		{
 			char instr_name[NUM_INSTR+1][MAX_INSTR_NAME_SIZE];
 			profile* p;
+			int index_nop;
 		};
 
 		struct dynamic_data
@@ -54,29 +65,44 @@ class power_stats {
 			double window_power;
 			long long window_count;
 			unsigned int window_size;
-		  	double execution_time;
-			#endif
+		  	#endif
 
+
+			double execution_time;
+			sc_core::sc_time system_time;
 			long long total_num_instr; 
 			double total_energy;
 			double total_power;
 
+			/*****/
+			double edp;
+			double energy_per_core;
+
+			int delta_instr;
+			int last_delta_instr;
+
+			double delta_t;
+
 			unsigned int actual_profile;
 			unsigned int num_profiles;
+
+			bool freq_changed;
 		};
 
 		dynamic_data dyn;
 		power_stats_data psc_data;
-
+		
 		
 		#ifdef WINDOW_REPORT
 		FILE* out_window_power_report;
+		
 		#endif
 
 		#ifdef DEBUG 
 		FILE* debug_file;
-		int contador_debug = 0;
+		int contador_debug;
 		#endif
+
 
 
 
@@ -94,7 +120,19 @@ class power_stats {
 			dyn.total_num_instr = 0;
 			dyn.total_energy = 0;
 			dyn.total_power = 0;
+
+			/******/
+			dyn.edp = 0;
+			dyn.energy_per_core = 0;
+			dyn.delta_instr = 0;
+			dyn.delta_t = 0;
+			dyn.last_delta_instr = 0;
+				
+			dyn.freq_changed = false;
+
 			
+			char filename[512];
+
 			#ifdef WINDOW_REPORT
 			dyn.window_size = START_WINDOW_SIZE;
 			dyn.window_num_instr = 0;
@@ -102,9 +140,10 @@ class power_stats {
 			dyn.window_power = 0;
 			dyn.window_count = 0;
 			dyn.execution_time = 0;
+			dyn.system_time = sc_time(0,SC_NS);
 
 			/****/
-			char filename[512];
+			
 			strcpy(filename, WINDOW_REPORT_FILE);
 			strcat(filename, "_");
 			strcat(filename, proc_name);
@@ -117,7 +156,6 @@ class power_stats {
 			/****/
 			#endif
 			
-
 			#ifdef DEBUG 
 			strcpy (filename, "debug_power");
 			strcat(filename, "_");
@@ -129,15 +167,12 @@ class power_stats {
 				perror("Couldn't open specified debug file");
 				exit(1);
 			}
-			#endif
-
-			#ifdef DEBUG
+			contador_debug = 0;
+						
 			print_psc_data();
 			#endif
 		}
-
-
-		
+	
 
 		// Destructor
 		~power_stats()
@@ -164,20 +199,63 @@ class power_stats {
 			double power = psc_data.p[profile].power[id] * psc_data.p[profile].power_scale * psc_data.p[profile].freq_scale * psc_data.p[profile].freq;
 
 			#ifdef DEBUG
-			if (contador_debug < 200)
-			{
-				fprintf(debug_file,"\nGetting power instruction.");
-				fprintf(debug_file,"\nprofile: %d\t id: %d\t power[id]*power_scale*freq_scale*freq = %f * %f * %f * %d" , profile, id, psc_data.p[profile].power[id], psc_data.p[profile].power_scale, psc_data.p[profile].freq_scale, psc_data.p[profile].freq);
-				fprintf(debug_file,"\nReturning: %f", power);
-				contador_debug++;
-			}	
+			fprintf(debug_file,"\nGetting power instruction.");
+			fprintf(debug_file,"\nprofile: %d\t id: %d\t power[id]*power_scale*freq_scale*freq = %f * %f * %f * %d" , profile, id, psc_data.p[profile].power[id], psc_data.p[profile].power_scale, psc_data.p[profile].freq_scale, psc_data.p[profile].freq);
+			fprintf(debug_file,"\nReturning: %f", power);
+			contador_debug++;
 			#endif
-
-			
 			
 			return power;
 		}
 
+		double update_energy (int id, int profile)
+		{
+
+			//printf("\nupdate_energy id=%d  profile=%d", id, profile);
+
+			double energy_per_instruction = psc_data.p[profile].power[id]; // * psc_data.p[profile].power_scale;
+			
+			set_edp(dyn.edp + energy_per_instruction);
+			dyn.energy_per_core = dyn.energy_per_core + energy_per_instruction;
+		}
+
+	
+		double get_energy_stamp (int prof)
+		{
+
+			dyn.delta_instr = get_total_num_instr() - dyn.delta_instr;  // total de instr executadas no delta_T atual
+			int freq = psc_data.p[prof].freq; // freq em MegaHz
+			double cycle_time_ns = 1000/freq;  // tempo de um ciclo em nanossegundos
+			double edp = get_edp();
+
+			double energyStampUsingFreq = (double) edp*dyn.delta_instr*cycle_time_ns;
+		
+			dyn.delta_t = sc_time_stamp().to_seconds() - dyn.delta_t;
+
+
+			double t = dyn.delta_t*1000000000;    // em nanossegundos
+
+			
+			double energyStampUsingTime = edp*t;
+
+			return energyStampUsingTime;
+		}	
+
+		void initialize_energy_stamp()
+		{
+			dyn.edp = 0.0;
+			dyn.delta_instr = 0;
+
+		}
+
+		double get_edp ()
+		{
+			return dyn.edp;
+		}
+		void set_edp (double value)
+		{
+			dyn.edp = value;
+		}
     	int type_line(int line, int num_profiles)
     	{
       		if (num_profiles == 0)
@@ -202,11 +280,6 @@ class power_stats {
 			dyn.window_energy += v;
 		}
 
-		// double estimate_execution_time() {
-		//	dyn.execution_time += dyn.window_count / (psc_data.p[dyn.actual_profile].freq * psc_data.p[dyn.actual_profile].freq_scale);
-		//	return dyn.execution_time;
-		// }
-
 		void reset_window_data()
 		{
 			dyn.window_num_instr = 0;
@@ -216,71 +289,115 @@ class power_stats {
 
 		void calc_window_power()
 		{
+
 			dyn.window_power = dyn.window_energy / dyn.window_num_instr;
 		}
 
 		void window_power_report()
 		{
-			//estimate_execution_time();
+			
 			fprintf(out_window_power_report, "%d,%.10lf,%lld,%.10lf\n", dyn.actual_profile, dyn.execution_time, dyn.window_count, dyn.window_power);
 		}
 		#endif
 
 		void incr_total_energy(double v) {
 			dyn.total_energy += v;
+
 		}
 
     	void incr_execution_time(int num_instr, int p)
     	{
+
+    		dyn.system_time = sc_time_stamp ();
+
 			dyn.execution_time += num_instr / (psc_data.p[dyn.actual_profile].freq * psc_data.p[dyn.actual_profile].freq_scale);
+		
     	}
 
-		void update_stat_power(int instr_id)
+		void update_stat_power(int instr_id, int n = 1)
 		{
-  			dyn.total_num_instr++;
-			incr_total_energy(get_power_instruction(instr_id, dyn.actual_profile));
-      		incr_execution_time(1, dyn.actual_profile);
-      		//if (dyn.total_num_instr % 10000 == 0) {
-      		//  printf("[%10lld] %4d %10.5lf %10.5lf\n", dyn.total_num_instr, instr_id, get_power_instruction(instr_id, dyn.actual_profile), dyn.total_energy); 
-      		//}
+
+			#ifdef DEBUG 
+			if (n!=1)
+			{	
+				printf("\nPOWER_STATS: calculating power after change frequency.");
+				printf("\nPOWER_STATS: NOP id: %d  , NOP power: %f",instr_id, get_power_instruction(instr_id, dyn.actual_profile));
+			}	
+			#endif
+
+  			dyn.total_num_instr = dyn.total_num_instr + n;
+			incr_execution_time(n, dyn.actual_profile);
+
+			incr_total_energy(n * get_power_instruction(instr_id, dyn.actual_profile));
+     		
+
+     		update_energy(instr_id, dyn.actual_profile);
+
 			#ifdef WINDOW_REPORT
-			dyn.window_num_instr++;
-			incr_window_energy(get_power_instruction(instr_id, dyn.actual_profile));
+
+			dyn.window_num_instr = dyn.window_num_instr + n;
 
 			
-			if (dyn.window_num_instr == dyn.window_size)
+			incr_window_energy(n* get_power_instruction(instr_id, dyn.actual_profile));
+
+		
+			if (dyn.window_num_instr >= dyn.window_size)
 			{
 				dyn.window_count++;
 				calc_window_power();
 				window_power_report();
 				reset_window_data();
-				//if (dyn.window_count == 360) dyn.actual_profile = 1;
 			}
 			#endif
+
 		}
 
+
+		double get_total_num_instr ()
+		{
+			return dyn.total_num_instr;
+		}
+		double get_total_energy()
+		{
+			return dyn.total_energy;
+		}
+
+		double get_total_power ()
+		{
+			calc_total_power();
+			return dyn.total_power;
+		}
 		void calc_total_power()
 		{
 			dyn.total_power = dyn.total_energy / dyn.total_num_instr;
 
 			#ifdef DEBUG
-			fprintf(debug_file,"\n\nCalculating total power = %f:", dyn.total_power = dyn.total_energy / dyn.total_num_instr);			
+			fprintf(debug_file,"\n\nCalculating total power = %f:", dyn.total_power);
 			#endif
 		}
 
 		void powersc_connect()
 		{
 			calc_total_power();
+
+			// teste
 			psc_info.set_power(dyn.total_power);
 			psc_info.set_level(PSC_RT_LEVEL);
 			PSC_INSERT_CELL(psc_info);
+
 		}
 
 		void report()
 		{
 			PSC_REPORT_POWER;
+			dyn.system_time = sc_time_stamp();
+			
 		}
 
+		double getEnergyPerCore()
+		{
+			return dyn.energy_per_core;
+		}
 		char* next_strtok(const char* param, FILE* f, int pos_line)
 		{
 			char* pch = NULL;
@@ -320,7 +437,7 @@ class power_stats {
 
 			f = fopen(buff, "r");
 			if (f == NULL) {
-				sprintf(aux, "Power file %s not found", filename);
+				sprintf(aux, "Power file %s not found", buff);
 				perror(aux);
 				exit(1);
 			}
@@ -347,7 +464,7 @@ class power_stats {
           			{
             			case TYPE_LINE_NUM_PROFILE:
               				dyn.num_profiles = atoi(pch);
-
+              				
 					  		psc_data.p = (profile *)malloc(sizeof(profile) * dyn.num_profiles);
              				// Cleaning table
              				for(int j = 0; j <= NUM_INSTR; j++) {
@@ -359,7 +476,7 @@ class power_stats {
             			break;
 
             			case TYPE_LINE_PROFILE:
-					  		//profile_id = atoi(pch);
+					  		
             				profile_id = state_id++;
 
             				if (profile_id >= dyn.num_profiles) {
@@ -391,11 +508,13 @@ class power_stats {
     						}
             			break;
             			default: // TYPE_LINE_OP
+            				
     						index = atoi(pch);
-
-              				if (index <= NUM_INSTR) {
+    						if (index <= NUM_INSTR) {
     					  		pch = next_strtok(",\"", f, pos_line);
     					  		strcpy(psc_data.instr_name[index], pch);
+    					  		if (!strcmp(pch,"nop")) psc_data.index_nop = index;  // capture the  NOP index
+
     					  		for(int i = 0; i < dyn.num_profiles;i++)
     					  		{
     					  			pch = next_strtok(",\"", f, pos_line);
@@ -406,6 +525,7 @@ class power_stats {
           			}
 				}
 			} while(!feof(f));
+
 			fclose(f);
 
 			
@@ -424,15 +544,14 @@ class power_stats {
 				printf("Description: %s\n", psc_data.p[p].power_stats_descr);
 				printf("Frequency: %d\n\n", psc_data.p[p].freq);
 				printf("Frequency: %f\n\n", psc_data.p[p].freq_scale);
-
+				printf("NOP Power: %f\n\n", psc_data.p[p].power[psc_data.index_nop]);
 				
 				fprintf(debug_file,"\nProfile %d\n", p);
 				fprintf(debug_file,"Name: %s\n", psc_data.p[p].power_stats_name);
 				fprintf(debug_file,"Description: %s\n", psc_data.p[p].power_stats_descr);
 				fprintf(debug_file,"Frequency: %d\n\n", psc_data.p[p].freq);
 				fprintf(debug_file,"Frequency: %f\n\n", psc_data.p[p].freq_scale);
-				
-				
+				fprintf(debug_file,"NOP Power: %f\n\n", psc_data.p[p].power[psc_data.index_nop]);
 			}
 
 			printf("Instr ID | Instruction Name");
@@ -449,7 +568,9 @@ class power_stats {
 				for(p = 0; p < dyn.num_profiles; p++) {
 					printf(" | %15.3lf", psc_data.p[p].power[i]);
 					fprintf(debug_file," | %15.3lf", psc_data.p[p].power[i]);
+
 				}
+
 				printf("\n");
 				fprintf(debug_file,"\n");
 			}
@@ -470,10 +591,27 @@ class power_stats {
 			if (state < dyn.num_profiles)
 			{
 				dyn.actual_profile = state;
+
+				update_stat_power (psc_data.index_nop, CYCLES_PER_FREQUENCY_EXCHANGE);
+				
+				dyn.freq_changed = true;
+
 				#ifdef DEBUG 
 				printf("\nPOWER_STATS: updating the power state to %d ",state);
 				#endif
 			}
+		}
+
+		bool needToWait()
+		{
+			if (dyn.freq_changed)
+			{	
+				dyn.freq_changed = false;
+				return (true);
+			}
+			else return (false);
+			
+
 		}
 
 		int getNumberOfStates()
@@ -496,5 +634,11 @@ class power_stats {
 		}
 		
 
+		void computeRestartPower ()
+		{
+			update_stat_power (psc_data.index_nop, CYCLES_TO_RESTART);
+		}
+
 };
 #endif
+
