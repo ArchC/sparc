@@ -34,7 +34,8 @@ AC_ARCH(sparc){
   ac_regbank REGS:32;
 
   ac_reg npc;
-
+  ac_tlm2_intr_port intr_port;
+  
   ac_reg<1> PSR_icc_n;
   ac_reg<1> PSR_icc_z;
   ac_reg<1> PSR_icc_v;
