@@ -28,11 +28,7 @@ AC_ARCH(sparc){
   ac_icache   IC("2w", 128, 32, "wb", "fifo");
   ac_dcache   DC("2w", 512, 32, "wt", "fifo");
   
-
-
   ac_tlm2_intr_port intr_port;
-  
-
   ac_regbank RB:256;
   ac_regbank REGS:32;
 
