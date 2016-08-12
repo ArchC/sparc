@@ -61,10 +61,10 @@ void sparc::reg_write( int reg, ac_word value ) {
 
 
 unsigned char sparc::mem_read( unsigned int address ) {
-  return IM->read_byte( address );
+  return DATA_PORT->read_byte( address );
 }
 
 
 void sparc::mem_write( unsigned int address, unsigned char byte ) {
-  IM->write_byte( address, byte );
+  DATA_PORT->write_byte( address, byte );
 }
